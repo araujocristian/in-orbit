@@ -4,11 +4,11 @@ import { DialogTrigger } from './ui/dialog'
 import { InOrbitIcon } from './in-orbit-icon'
 import { Progress, ProgressIndicator } from './ui/progress-bar'
 import { Separator } from './ui/separator'
-import { OutlineButton } from './ui/outline-button'
 import { useQuery } from '@tanstack/react-query'
 import { getSummary } from '../http/get-summary'
 import dayjs from 'dayjs'
 import ptBr from 'dayjs/locale/pt-br'
+import { PendingGoals } from './pending-goals'
 
 dayjs.locale(ptBr)
 
@@ -62,44 +62,37 @@ export function Summary() {
       </div>
       <Separator />
 
-      <div className="flex flex-wrap gap-3">
-        <OutlineButton>
-          <Plus className="size-4 text-zinc-600" />
-          Nadar
-        </OutlineButton>
-        <OutlineButton>
-          <Plus className="size-4 text-zinc-600" />
-          Meditar
-        </OutlineButton>
-        <OutlineButton>
-          <Plus className="size-4 text-zinc-600" />
-          Estudar
-        </OutlineButton>
-        <OutlineButton>
-          <Plus className="size-4 text-zinc-600" />
-          Arrumar casa
-        </OutlineButton>
-      </div>
+      <PendingGoals />
 
       <div className="flex flex-col gap-6">
         <h2 className="text-xl font-medium">Sua semana</h2>
 
         {Object.entries(data?.goalsPerDay).map(([date, goals]) => {
+          const weekDay = dayjs(date).format('dddd')
+          const formattedDate = dayjs(date).format('D[ de ]MMMM')
           return (
             <div className="flex flex-col gap-4" key={date}>
               <h3 className="font-medium">
-                {date}{' '}
-                <span className="text-zinc-400 text-xs">(10 de Agosto)</span>
+                <span className="capitalize">{weekDay}</span>{' '}
+                <span className="text-zinc-400 text-xs">({formattedDate})</span>
               </h3>
 
               <ul className="flex flex-col gap-3">
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="size-4 text-pink-500" />
-                  <span className="text-sm text-zinc-400">
-                    Você completou "<span className="text-zinc-100">Nadar</span>
-                    " às <span className="text-zinc-100">08:13h</span>
-                  </span>
-                </li>
+                {goals.map(goal => {
+                  const completedTime = dayjs(goal.completedAt).format(
+                    'HH:mm[h]'
+                  )
+                  return (
+                    <li key={goal.id} className="flex items-center gap-2">
+                      <CheckCircle2 className="size-4 text-pink-500" />
+                      <span className="text-sm text-zinc-400">
+                        Você completou "
+                        <span className="text-zinc-100">{goal.title}</span>" às{' '}
+                        <span className="text-zinc-100">{completedTime}</span>
+                      </span>
+                    </li>
+                  )
+                })}
               </ul>
             </div>
           )
